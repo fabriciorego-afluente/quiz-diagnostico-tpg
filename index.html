@@ -409,7 +409,7 @@ fbq('track', 'PageView');
 /* ============================================================
    CONFIG — troque pela URL do seu Apps Script Web App
    ============================================================ */
-const GOOGLE_SHEET_URL = "COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxjq0flsNYse_Yp5byR_Cj7jYJXhn2b-gP3FOYMY8ASluDtIYjw4K4j0AWza721u073-g/exec";
 const LINK_CANDIDATURA = "https://form.respondi.app/m9rlXQmR";
 const LINK_WHATSAPP = "https://w.app/tuuoow";
 const FOTO_CAPA = "foto-capa.jpg"; // placeholder - troque pela foto enviada
@@ -823,7 +823,7 @@ function submitToSheet(){
     respostas: JSON.stringify(state.answers)
   };
 
-  if(GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "https://script.google.com/macros/s/AKfycbw-UiynJ2C0smOp5q-Xu5FEJ5gY4IxWzIGMk3ozIghWrEF2Djvh_TJ_XKWUCe8CjiqKxg/exec"){
+  if(GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "https://script.google.com/macros/s/AKfycbxjq0flsNYse_Yp5byR_Cj7jYJXhn2b-gP3FOYMY8ASluDtIYjw4K4j0AWza721u073-g/exec"){
     fetch(GOOGLE_SHEET_URL, {
       method:'POST',
       mode:'no-cors',
