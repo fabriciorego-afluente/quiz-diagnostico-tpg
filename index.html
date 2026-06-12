@@ -202,7 +202,19 @@
   .option:active, .option:hover{
     border-color:var(--glow);
     background:var(--current);
-    transform:translateY(-1px);
+  }
+  .option.selected{
+    border-color:var(--glow);
+    background:var(--current);
+    box-shadow:0 0 0 1px var(--glow);
+  }
+  .option:disabled{
+    cursor:default;
+    opacity:0.55;
+  }
+  .option:disabled:hover{
+    background:var(--deep);
+    border-color:var(--current);
   }
 
   /* feedback overlay */
@@ -409,7 +421,6 @@ fbq('track', 'PageView');
 
 <script>
 /* ============================================================
-   /* ============================================================
    CONFIG — troque pela URL do seu Apps Script Web App
    ============================================================ */
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxjq0flsNYse_Yp5byR_Cj7jYJXhn2b-gP3FOYMY8ASluDtIYjw4K4j0AWza721u073-g/exec";
@@ -639,6 +650,8 @@ function renderP0(main){
     btn.className = 'option';
     btn.textContent = o.label;
     btn.onclick = ()=>{
+      Array.from(optsContainer.children).forEach(c=>c.disabled=true);
+      btn.classList.add('selected');
       state.answers.p0 = o.value;
       state.trilha = o.trilha;
       showFeedback(o.feedback, ()=>{
@@ -691,6 +704,8 @@ function renderQuestion(main){
     btn.className = 'option';
     btn.textContent = o.label;
     btn.onclick = ()=>{
+      Array.from(optsContainer.children).forEach(c=>c.disabled=true);
+      btn.classList.add('selected');
       state.answers[q.key] = o.value;
       if(o.tag && o.peso){
         state.tags[o.tag] = (state.tags[o.tag]||0) + o.peso;
