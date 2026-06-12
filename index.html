@@ -197,6 +197,7 @@
     cursor:pointer;
     transition:all .2s ease;
     -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
   }
   .option:active, .option:hover{
     border-color:var(--glow);
@@ -273,6 +274,7 @@
     box-shadow:0 8px 24px rgba(74,138,196,0.35);
   }
   .btn:active{transform:scale(0.98);}
+  .btn{touch-action:manipulation;}
   .btn-secondary{
     background:linear-gradient(135deg, #5B9BD9 0%, #2A5A8C 100%);
     color:var(--ice);
