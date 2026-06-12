@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Diagnóstico T.P.G. — Afluente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --abyss:#0A0E14;
+    --deep:#0D2240;
+    --current:#1A3A5C;
+    --river:#2A5A8C;
+    --silver:#B8C5D4;
+    --mist:#F0F2F5;
+    --ice:#FFFFFF;
+    --glow:#4A8AC4;
+    --steel:#3A4A5C;
+    --slate:#6B7B8D;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'DM Sans',sans-serif;
+    background:var(--abyss);
+    color:var(--mist);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    width:100%;
+    max-width:520px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  /* Wave decoration */
+  .waves{
+    position:absolute;
+    top:0; left:0; right:0;
+    height:120px;
+    overflow:hidden;
+    opacity:0.35;
+    pointer-events:none;
+    z-index:0;
+  }
+  .waves svg{width:100%;height:100%;}
+
+  header{
+    padding:28px 24px 16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    position:relative;
+    z-index:1;
+  }
+  header .logo-text{
+    font-family:'Outfit',sans-serif;
+    font-weight:300;
+    font-size:22px;
+    letter-spacing:0.25em;
+    color:var(--mist);
+  }
+  header .logo-sub{
+    font-family:'Space Mono',monospace;
+    font-size:9px;
+    letter-spacing:0.2em;
+    color:var(--slate);
+    display:block;
+    margin-top:2px;
+  }
+
+  main{
+    flex:1;
+    padding:8px 24px 100px;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    z-index:1;
+  }
+
+  /* progress bar */
+  .progress-wrap{
+    width:100%;
+    height:3px;
+    background:var(--current);
+    border-radius:2px;
+    overflow:hidden;
+    margin-bottom:28px;
+  }
+  .progress-bar{
+    height:100%;
+    background:var(--glow);
+    transition:width .4s ease;
+    width:0%;
+  }
+
+  /* cover */
+  .cover{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+  }
+  .cover-photo{
+    width:100%;
+    aspect-ratio:1/1;
+    max-height:280px;
+    border-radius:16px;
+    object-fit:cover;
+    border:1px solid var(--current);
+    box-shadow:0 20px 60px rgba(74,138,196,0.15);
+  }
+  h1{
+    font-family:'Outfit',sans-serif;
+    font-weight:300;
+    font-size:28px;
+    line-height:1.3;
+    color:var(--ice);
+  }
+  h1 .accent{color:var(--glow);}
+  .subhead{
+    font-size:15px;
+    color:var(--silver);
+    line-height:1.6;
+  }
+  .bullets{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin:8px 0;
+  }
+  .bullet{
+    font-size:14px;
+    color:var(--silver);
+    padding-left:18px;
+    position:relative;
+    line-height:1.5;
+  }
+  .bullet::before{
+    content:'';
+    position:absolute;
+    left:0; top:8px;
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--glow);
+  }
+  .support-text{
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    color:var(--slate);
+    line-height:1.7;
+    border-top:1px solid var(--current);
+    padding-top:16px;
+    margin-top:8px;
+  }
+
+  /* question */
+  .q-eyebrow{
+    font-family:'Space Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.15em;
+    color:var(--glow);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  .q-context{
+    font-size:14px;
+    color:var(--silver);
+    line-height:1.7;
+    margin-bottom:18px;
+  }
+  .q-title{
+    font-family:'Outfit',sans-serif;
+    font-weight:400;
+    font-size:21px;
+    color:var(--ice);
+    line-height:1.4;
+    margin-bottom:24px;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .option{
+    background:var(--deep);
+    border:1px solid var(--current);
+    border-radius:12px;
+    padding:16px 18px;
+    color:var(--mist);
+    font-size:14.5px;
+    line-height:1.5;
+    text-align:left;
+    cursor:pointer;
+    transition:all .2s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .option:active, .option:hover{
+    border-color:var(--glow);
+    background:var(--current);
+    transform:translateY(-1px);
+  }
+
+  /* feedback overlay */
+  .feedback{
+    position:fixed;
+    bottom:0; left:50%;
+    transform:translateX(-50%);
+    width:100%;
+    max-width:520px;
+    background:var(--river);
+    color:var(--ice);
+    padding:18px 24px;
+    font-size:13.5px;
+    line-height:1.6;
+    border-top:1px solid var(--glow);
+    animation:slideUp .35s ease;
+    z-index:10;
+  }
+  @keyframes slideUp{
+    from{transform:translate(-50%,100%);}
+    to{transform:translate(-50%,0);}
+  }
+
+  /* capture form */
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:16px;
+  }
+  label{
+    font-family:'Space Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    color:var(--slate);
+    text-transform:uppercase;
+  }
+  input{
+    background:var(--deep);
+    border:1px solid var(--current);
+    border-radius:10px;
+    padding:14px 16px;
+    color:var(--ice);
+    font-size:15px;
+    font-family:'DM Sans',sans-serif;
+    outline:none;
+    transition:border-color .2s;
+  }
+  input:focus{border-color:var(--glow);}
+  input::placeholder{color:var(--slate);}
+
+  /* buttons */
+  .btn{
+    margin-top:8px;
+    background:linear-gradient(135deg, #5B9BD9 0%, #2A5A8C 100%);
+    color:var(--ice);
+    border:none;
+    border-radius:50px;
+    padding:18px 28px;
+    font-family:'DM Sans',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:0.01em;
+    cursor:pointer;
+    text-align:center;
+    transition:all .2s;
+    text-decoration:none;
+    display:block;
+    box-shadow:0 8px 24px rgba(74,138,196,0.35);
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn-secondary{
+    background:linear-gradient(135deg, #5B9BD9 0%, #2A5A8C 100%);
+    color:var(--ice);
+  }
+
+  /* result screens */
+  .result-tag{
+    font-family:'Space Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.15em;
+    color:var(--glow);
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  .result-title{
+    font-family:'Outfit',sans-serif;
+    font-weight:300;
+    font-size:24px;
+    color:var(--ice);
+    line-height:1.35;
+    margin-bottom:16px;
+  }
+  .result-body p{
+    font-size:14.5px;
+    color:var(--silver);
+    line-height:1.75;
+    margin-bottom:14px;
+  }
+  .result-list{
+    background:var(--deep);
+    border:1px solid var(--current);
+    border-radius:12px;
+    padding:18px 20px;
+    margin:18px 0;
+  }
+  .result-list-title{
+    font-family:'Space Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    color:var(--glow);
+    text-transform:uppercase;
+    margin-bottom:12px;
+  }
+  .result-list ul{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .result-list li{
+    font-size:13.5px;
+    color:var(--silver);
+    line-height:1.5;
+    padding-left:16px;
+    position:relative;
+  }
+  .result-list li::before{
+    content:'';
+    position:absolute;
+    left:0; top:7px;
+    width:5px; height:5px;
+    border-radius:50%;
+    background:var(--glow);
+  }
+  .signature{
+    margin-top:28px;
+    padding-top:18px;
+    border-top:1px solid var(--current);
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    color:var(--slate);
+  }
+
+  /* loading */
+  .loading-screen{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+  }
+  .spinner{
+    width:36px;height:36px;
+    border:2px solid var(--current);
+    border-top-color:var(--glow);
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-screen p{
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    color:var(--slate);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="waves">
+    <svg viewBox="0 0 500 120" preserveAspectRatio="none">
+      <path d="M0,40 Q125,10 250,40 T500,40" fill="none" stroke="#1A3A5C" stroke-width="2"/>
+      <path d="M0,65 Q125,35 250,65 T500,65" fill="none" stroke="#2A5A8C" stroke-width="2"/>
+      <path d="M0,90 Q125,60 250,90 T500,90" fill="none" stroke="#4A8AC4" stroke-width="2"/>
+    </svg>
+  </div>
+  <header>
+    <div>
+      <span class="logo-text">AFLUENTE</span>
+      <span class="logo-sub">MENTORIA COMERCIAL</span>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '809401277482294');
+fbq('track', 'PageView');
+</script>
+<!-- End Meta Pixel Code -->
+
+<script>
+/* ============================================================
+   CONFIG — troque pela URL do seu Apps Script Web App
+   ============================================================ */
+const GOOGLE_SHEET_URL = "COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT";
+const LINK_CANDIDATURA = "https://form.respondi.app/m9rlXQmR";
+const LINK_WHATSAPP = "https://w.app/tuuoow";
+const FOTO_CAPA = "https://i.imgur.com/8YQbXfX.jpg"; // placeholder - troque pela foto enviada
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let state = {
+  screen: 'cover',
+  trilha: null, // 1 ou 2
+  answers: {},
+  tags: { tecnica:0, processo:0, gestao:0 },
+  perfilFlag: null, // para trilha 1
+  lead: { nome:'', email:'', whatsapp:'', instagram:'' },
+  resultado: null
+};
+
+const QUESTIONS_T1 = [
+  {
+    id:'p1_1', key:'ticket',
+    eyebrow:'Pilar 1 de 5',
+    context:"A estrutura comercial que funciona pra negócios digitais de alto valor tem regras próprias. Contratar, treinar e gerir um time só faz sentido quando cada venda gera receita suficiente pra justificar a operação. Abaixo de um certo patamar, o custo de manter o time come o lucro.",
+    title:"Qual o ticket médio do seu produto mais caro ativo no momento?",
+    options:[
+      {label:"Abaixo de R$ 1.500", value:"baixo", feedback:"Nessa faixa, um comercial estruturado custa mais do que retorna."},
+      {label:"Entre R$ 1.500 e R$ 3.000", value:"limitrofe", feedback:"Dá pra fazer funcionar, mas a margem é apertada. Vamos ver o resto."},
+      {label:"Entre R$ 3.000 e R$ 5.000", value:"ideal", feedback:"Faixa ideal. O ticket sustenta a operação com margem saudável."},
+      {label:"Acima de R$ 5.000", value:"ideal_plus", feedback:"Cada venda que o time faz paga múltiplas vezes o custo da operação."}
+    ]
+  },
+  {
+    id:'p1_2', key:'leads',
+    eyebrow:'Pilar 2 de 5',
+    context:"Time comercial sem lead é carro sem gasolina. Antes de construir a operação, precisa existir um fluxo mínimo de oportunidades pra alimentar o funil. Sem isso, o time fica parado e o custo fixo come o caixa.",
+    title:"Quantos leads novos o seu marketing gera por mês, em média?",
+    options:[
+      {label:"Menos de 50", value:"baixo", feedback:"Volume baixo pra sustentar um time. O primeiro passo pode ser marketing, não comercial."},
+      {label:"Entre 50 e 100", value:"minimo", feedback:"Dá pra começar, mas sem margem de erro. Cada lead precisa ser muito bem trabalhado."},
+      {label:"Mais de 100", value:"saudavel", feedback:"Volume que sustenta operação. A questão é: quantos desses estão sendo desperdiçados?"}
+    ]
+  },
+  {
+    id:'p1_3', key:'custo_ausencia',
+    eyebrow:'Pilar 3 de 5',
+    context:"Quando o dono é o único que vende, o negócio tem um teto invisível: o tempo e a energia de uma pessoa. Tudo funciona, até que você precise parar. E quando você para, o negócio descobre que não tem um comercial, tem você.",
+    title:"Se você parasse de vender pessoalmente (seja diretamente, seja por lançamento) por 30 a 60 dias, o que aconteceria com a receita?",
+    options:[
+      {label:"Pararia quase por completo", value:"total", feedback:"Isso significa que o negócio é você. Se você para, ele para. Isso tem um custo que cresce todo mês."},
+      {label:"Cairia bastante, mas não zeraria", value:"parcial", feedback:"Alguma coisa sustenta — mas provavelmente é inércia de lançamento ou recompra, não estrutura."},
+      {label:"Nem sei, porque nunca consigo sair por 30 dias", value:"nunca", feedback:"Essa é a resposta mais reveladora de todas. A impossibilidade de sair já é o diagnóstico."}
+    ]
+  },
+  {
+    id:'p1_4', key:'tentativas',
+    eyebrow:'Pilar 4 de 5',
+    context:"A maioria dos donos de negócio digital que chega aqui já tentou resolver isso de algum jeito. E a maioria não conseguiu, não por falta de vontade, mas porque aplicou a solução errada pro problema errado.",
+    title:"O que mais te impede de ter alguém vendendo por você hoje?",
+    options:[
+      {label:"Não sei que perfil contratar nem como treinar", value:"perfil", feedback:"Normal. A maioria dos donos nunca fez isso — e a primeira contratação é a mais arriscada se feita sem método."},
+      {label:"Já tentei, contratei e não funcionou", value:"tentou", feedback:"Vendedor sem processo, treinamento e gestão é como piloto sem instrumento. A pessoa não é o problema."},
+      {label:"Tenho receio de perder qualidade na venda", value:"receio", feedback:"Legítimo. Mas enquanto só você vende com qualidade, o negócio tem teto. Qualidade se replica com método."},
+      {label:"Nunca parei pra estruturar isso de verdade", value:"nunca_estruturou", feedback:"A boa notícia: começar certo é melhor que consertar errado."}
+    ]
+  },
+  {
+    id:'p1_5', key:'material',
+    eyebrow:'Pilar 5 de 5',
+    context:"Um comercial que funciona sem o dono precisa de infraestrutura mínima: script que o time possa seguir, funil com etapas claras e um CRM onde nada se perde. Sem isso, cada vendedor improvisa, e improviso não escala.",
+    title:"Você já tem algum material de vendas estruturado: script, processo documentado, CRM ativo?",
+    options:[
+      {label:"Nada disso", value:"nada", feedback:"Começar do zero parece assustador, mas é mais limpo que remendar. A construção é o caminho."},
+      {label:"Tenho algumas coisas soltas, mas desorganizado", value:"solto", feedback:"Material solto é material que não existe na prática. Organizar e integrar é parte da construção."},
+      {label:"Tenho CRM e anotações, mas ninguém usa com consistência", value:"sem_uso", feedback:"Ferramenta sem processo é decoração. O que falta é a cola: processo + gestão que faça o uso ser inevitável."}
+    ]
+  }
+];
+
+const QUESTIONS_T2 = [
+  {
+    id:'p2_1', key:'tecnica_script',
+    eyebrow:'Pilar 1 de 6 — Técnica',
+    context:"A técnica é o que o time fala, como fala, e por que fala daquele jeito. Quando não existe um discurso padronizado, cada vendedor reinventa a roda em cada ligação, e o resultado vira roleta.",
+    title:"Seu time tem um script ou discurso de vendas padronizado, que todos seguem?",
+    options:[
+      {label:"Não, cada um vende do seu jeito", value:"ausente", tag:"tecnica", peso:2, feedback:"Por isso a performance flutua. Não é o time — é ausência de trilho."},
+      {label:"Tem algo, mas ninguém segue de verdade", value:"parcial", tag:"tecnica", peso:1, feedback:"Ter documento e ter discurso adotado são coisas diferentes. Script só funciona se for treinado e cobrado."},
+      {label:"Sim, padronizado, seguido pelo time, sempre em revisão", value:"ok", tag:"tecnica", peso:0, feedback:"Isso já resolve o pilar mais básico. Vamos ver se Processo e Gestão acompanham."}
+    ]
+  },
+  {
+    id:'p2_2', key:'processo_conversao',
+    eyebrow:'Pilar 2 de 6 — Processo',
+    context:"Você não pode gerir o que não mede. A maioria dos donos sabe o faturamento do mês, mas não sabe por que o faturamento foi aquele, muito menos como replicar ou onde melhorar.",
+    title:"Você consegue dizer, agora, a taxa de conversão do seu time, de lead até venda fechada?",
+    options:[
+      {label:"Não faço ideia", value:"ausente", tag:"processo", peso:2, feedback:"Sem esse número, você não sabe se o problema é volume de leads, qualidade ou técnica de venda."},
+      {label:"Tenho uma noção, mas não acompanho formalmente", value:"parcial", tag:"processo", peso:1, feedback:"Intuição não é dado. Previsibilidade real vem de processo, não de feeling."},
+      {label:"Sim, acompanho de perto e sei onde trava", value:"ok", tag:"processo", peso:0, feedback:"Se você sabe onde trava e não resolveu, o gargalo provavelmente está em outro pilar."}
+    ]
+  },
+  {
+    id:'p2_3', key:'gestao_rotina',
+    eyebrow:'Pilar 3 de 6 — Gestão',
+    context:"Gestão comercial não é cobrar resultado e tocar sino em cada venda, é criar o ambiente onde o resultado acontece. Sem rotina de acompanhamento, o time opera no escuro.",
+    title:"Existe uma rotina de gestão do comercial: daily, reunião semanal, treinamento constante, simulação de vendas, feedback estruturado?",
+    options:[
+      {label:"Não existe rotina nenhuma", value:"ausente", tag:"gestao", peso:2, feedback:"Sem ritmo, a operação depende de vontade individual. Vontade é combustível que acaba."},
+      {label:"Acontece de vez em quando, sem frequência fixa", value:"parcial", tag:"gestao", peso:1, feedback:"Rotina intermitente é ausência disfarçada. O time só leva a sério o que é cobrado com consistência."},
+      {label:"Sim, rotina fixa e estruturada", value:"ok", tag:"gestao", peso:0, feedback:"Gestão ativa. Se mesmo assim o resultado não vem, o gap é específico — vamos encontrar."}
+    ]
+  },
+  {
+    id:'p2_4', key:'processo_followup',
+    eyebrow:'Pilar 4 de 6 — Processo',
+    context:"A maioria dos negócios digitais perde entre 40% e 60% da receita potencial em leads que demonstraram interesse mas não foram acompanhados. O lead não comprou na hora não significa que não vai comprar nunca.",
+    title:"Como está o follow-up dos leads que não compraram na primeira interação?",
+    options:[
+      {label:"Não existe. O lead esfria e morre.", value:"ausente", tag:"processo", peso:2, feedback:"Cada lead que morre sem follow-up é dinheiro que você já pagou pra trazer e jogou fora."},
+      {label:"Feito, mas sem padrão nem cadência", value:"parcial", tag:"processo", peso:1, feedback:"Follow-up sem cadência é como regar planta quando lembra. Às vezes funciona, quase sempre não."},
+      {label:"Tem cadência estruturada com regras claras", value:"ok", tag:"processo", peso:0, feedback:"Isso já te separa de 95% dos negócios digitais. O lead nunca esfria sem ser trabalhado."}
+    ]
+  },
+  {
+    id:'p2_5', key:'autodiagnostico',
+    eyebrow:'Pilar 5 de 6 — Autodiagnóstico',
+    context:"Agora eu quero ouvir a sua leitura. Você vive esse negócio todo dia — o que você acha que está travando? Na minha experiência, o dono quase sempre sabe onde dói, só não sabe como resolver.",
+    title:"O que mais te incomoda no seu comercial hoje?",
+    options:[
+      {label:"O time não converte o que deveria, parece falta de técnica", value:"tecnica", tag:"tecnica", peso:3, feedback:"Se o time tem oportunidade e não fecha, o discurso está fraco. Isso se resolve com treinamento, não com substituição."},
+      {label:"Falta processo, organização, previsibilidade", value:"processo", tag:"processo", peso:3, feedback:"Se você sente que é caótico, é porque é. Processo é a cola que transforma gente em time."},
+      {label:"Falta gestão, indicadores, saber onde mexer", value:"gestao", tag:"gestao", peso:3, feedback:"Você está dirigindo sem painel. O negócio roda, mas você não sabe consertar quando para."},
+      {label:"O resultado é bom, mas quero escalar com segurança", value:"maduro", tag:"maduro", peso:0, feedback:"Poucos chegam aqui. O próximo passo não é mais operacional — é estratégico."},
+      {label:"Não sei. Preciso de alguém de fora pra diagnosticar.", value:"aberto", tag:"aberto", peso:0, feedback:"Reconhecer que não sabe é sinal de maturidade, não de fraqueza. Pra isso serve o diagnóstico."}
+    ]
+  },
+  {
+    id:'p2_6', key:'gestao_cac',
+    eyebrow:'Pilar 6 de 6 — Gestão',
+    context:"Essa é a pergunta que separa quem tem gestão real de quem acha que tem. Saber quanto custa cada real que o time vende é o que permite decidir se o time está sendo investimento ou despesa.",
+    title:"Você sabe quanto custa, em comissão e salário, cada real que o time vende (CAC comercial)?",
+    options:[
+      {label:"Não", value:"ausente", tag:"gestao", peso:2, feedback:"Se não sabe o custo, não sabe o lucro real. E sem lucro real, não sabe se vale escalar."},
+      {label:"Mais ou menos — tenho uma ideia", value:"parcial", tag:"gestao", peso:1, feedback:"Uma ideia não é um número. Decisões de escala precisam de número."},
+      {label:"Sim, acompanho de perto", value:"ok", tag:"gestao", peso:0, feedback:"Você está num nível de maturidade que poucos alcançam. Vamos ver o resultado geral."}
+    ]
+  }
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function fbqTrack(event, params){
+  if(window.fbq) fbq('track', event, params || {});
+}
+
+function render(){
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  if(state.screen === 'cover') renderCover(main);
+  else if(state.screen === 'p0') renderP0(main);
+  else if(state.screen === 'question') renderQuestion(main);
+  else if(state.screen === 'capture') renderCapture(main);
+  else if(state.screen === 'loading') renderLoading(main);
+  else if(state.screen === 'result') renderResult(main);
+  window.scrollTo(0,0);
+}
+
+function renderProgress(pct){
+  const wrap = document.createElement('div');
+  wrap.className = 'progress-wrap';
+  const bar = document.createElement('div');
+  bar.className = 'progress-bar';
+  bar.style.width = pct+'%';
+  wrap.appendChild(bar);
+  return wrap;
+}
+
+/* ============================================================
+   COVER
+   ============================================================ */
+function renderCover(main){
+  const div = document.createElement('div');
+  div.className = 'cover';
+  div.innerHTML = `
+    <img class="cover-photo" src="${FOTO_CAPA}" alt="Fabrício Rego">
+    <h1>Se eu te perguntasse quanto seu negócio vai faturar <span class="accent">mês que vem</span> e nos próximos três, você saberia responder?</h1>
+    <p class="subhead">Responda algumas perguntas e descubra o que está travando a previsibilidade da sua receita e qual é o caminho pra destravar.</p>
+    <p class="support-text">LEVA MENOS DE 3 MINUTOS. O DIAGNÓSTICO USA A METODOLOGIA T.P.G. (TÉCNICA, PROCESSO, GESTÃO) — A MESMA QUE USO COM CLIENTES QUE FATURAM MAIS DE R$ 3 MILHÕES AO ANO.</p>
+    <button class="btn" id="start-btn">Quero meu diagnóstico gratuito →</button>
+  `;
+  main.appendChild(div);
+  document.getElementById('start-btn').onclick = ()=>{
+    fbqTrack('Lead', {content_name:'quiz_start'});
+    state.screen = 'p0';
+    render();
+  };
+}
+
+/* ============================================================
+   P0
+   ============================================================ */
+function renderP0(main){
+  main.appendChild(renderProgress(8));
+
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="q-eyebrow">Pergunta inicial</div>
+    <div class="q-context">Antes de qualquer diagnóstico, preciso entender uma coisa fundamental: como o dinheiro entra hoje no seu negócio. A resposta a essa pergunta muda completamente o caminho daqui pra frente.</div>
+    <div class="q-title">Como o seu negócio vende hoje?</div>
+    <div class="options" id="opts"></div>
+  `;
+  main.appendChild(div);
+
+  const opts = [
+    {label:"Sou eu, o dono, que faço a maior parte das vendas", value:"A", trilha:1, feedback:"Você é o comercial. Isso funciona, até você não aguentar mais e perceber que virou um CLT de luxo do seu negócio."},
+    {label:"Vendo exclusivamente por lançamento", value:"B", trilha:1, feedback:"Lançamento traz receita, mas não traz previsibilidade. O próximo sempre traz um risco junto. Vamos ver o que isso custa."},
+    {label:"Tenho uma ou mais pessoas vendendo, mas sem processo definido", value:"C", trilha:2, feedback:"Ter gente vendendo e ter um comercial são coisas completamente diferentes."},
+    {label:"Tenho um time comercial com alguma estrutura e metas, mas tem vários pontos de melhoria", value:"D", trilha:2, feedback:"Isso já te coloca à frente de 90% do mercado. Vamos ver onde ajustar."}
+  ];
+
+  const optsContainer = document.getElementById('opts');
+  opts.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = o.label;
+    btn.onclick = ()=>{
+      state.answers.p0 = o.value;
+      state.trilha = o.trilha;
+      showFeedback(o.feedback, ()=>{
+        state.screen = 'question';
+        state.qIndex = 0;
+        render();
+      });
+    };
+    optsContainer.appendChild(btn);
+  });
+}
+
+/* ============================================================
+   FEEDBACK OVERLAY
+   ============================================================ */
+function showFeedback(text, onNext){
+  const fb = document.createElement('div');
+  fb.className = 'feedback';
+  fb.innerHTML = `<p>${text}</p><button class="btn" id="fb-next" style="margin-top:14px;">Continuar →</button>`;
+  document.getElementById('app').appendChild(fb);
+  document.getElementById('fb-next').onclick = ()=>{
+    fb.remove();
+    onNext();
+  };
+}
+
+/* ============================================================
+   QUESTIONS (Trilha 1 ou 2)
+   ============================================================ */
+function renderQuestion(main){
+  const list = state.trilha === 1 ? QUESTIONS_T1 : QUESTIONS_T2;
+  const q = list[state.qIndex];
+  const totalSteps = list.length + 1; // +1 para P0
+  const pct = Math.round(((state.qIndex+1)/totalSteps)*100 + (8 - 8/totalSteps));
+
+  main.appendChild(renderProgress(Math.min(pct, 95)));
+
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="q-eyebrow">${q.eyebrow}</div>
+    <div class="q-context">${q.context}</div>
+    <div class="q-title">${q.title}</div>
+    <div class="options" id="opts"></div>
+  `;
+  main.appendChild(div);
+
+  const optsContainer = document.getElementById('opts');
+  q.options.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = o.label;
+    btn.onclick = ()=>{
+      state.answers[q.key] = o.value;
+      if(o.tag && o.peso){
+        state.tags[o.tag] = (state.tags[o.tag]||0) + o.peso;
+      }
+      showFeedback(o.feedback, ()=>{
+        if(state.qIndex < list.length - 1){
+          state.qIndex++;
+          render();
+        } else {
+          computeResult();
+          state.screen = 'capture';
+          render();
+        }
+      });
+    };
+    optsContainer.appendChild(btn);
+  });
+}
+
+/* ============================================================
+   ROUTING LOGIC
+   ============================================================ */
+function computeResult(){
+  if(state.trilha === 1){
+    const ticket = state.answers.ticket;
+    const leads = state.answers.leads;
+    const ticketBaixo = (ticket === 'baixo');
+    const leadsBaixo = (leads === 'baixo');
+
+    if(ticketBaixo || leadsBaixo){
+      // Diagnóstico 1
+      state.resultado = 'd1';
+    } else {
+      state.resultado = 'd2';
+    }
+  } else {
+    // Trilha 2
+    const tags = state.tags;
+    const auto = state.answers.autodiagnostico;
+
+    if(auto === 'maduro' &&
+       state.answers.tecnica_script === 'ok' &&
+       state.answers.processo_conversao === 'ok' &&
+       state.answers.processo_followup === 'ok' &&
+       state.answers.gestao_rotina === 'ok' &&
+       state.answers.gestao_cac === 'ok'){
+      state.resultado = 'd5';
+      return;
+    }
+
+    if(auto === 'aberto'){
+      state.resultado = 'd4';
+      return;
+    }
+
+    // Regra de ouro: maior tag vence; empate ou tecnica menor -> d4
+    const max = Math.max(tags.tecnica, tags.processo, tags.gestao);
+    if(tags.tecnica === max && tags.tecnica > tags.processo && tags.tecnica > tags.gestao){
+      state.resultado = 'd3';
+    } else {
+      state.resultado = 'd4';
+    }
+  }
+}
+
+/* ============================================================
+   CAPTURE SCREEN
+   ============================================================ */
+function renderCapture(main){
+  main.appendChild(renderProgress(95));
+
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="q-eyebrow">Última etapa</div>
+    <h1 style="font-size:24px;margin-bottom:8px;">Seu diagnóstico está pronto.</h1>
+    <p class="subhead" style="margin-bottom:24px;">Preencha abaixo pra ver o resultado e o mapa do que falta no comercial do seu negócio.</p>
+    <div class="form-group">
+      <label>Nome</label>
+      <input type="text" id="f-nome" placeholder="Seu nome">
+    </div>
+    <div class="form-group">
+      <label>E-mail</label>
+      <input type="email" id="f-email" placeholder="seu@email.com">
+    </div>
+    <div class="form-group">
+      <label>WhatsApp</label>
+      <input type="tel" id="f-whats" placeholder="(00) 00000-0000">
+    </div>
+    <div class="form-group">
+      <label>Instagram (opcional)</label>
+      <input type="text" id="f-insta" placeholder="@seuinstagram">
+    </div>
+    <button class="btn" id="submit-btn">VER MEU DIAGNÓSTICO →</button>
+    <p id="error-msg" style="color:#E07A5F;font-size:12px;margin-top:10px;display:none;"></p>
+  `;
+  main.appendChild(div);
+
+  document.getElementById('submit-btn').onclick = ()=>{
+    const nome = document.getElementById('f-nome').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    const whats = document.getElementById('f-whats').value.trim();
+    const insta = document.getElementById('f-insta').value.trim();
+    const err = document.getElementById('error-msg');
+
+    if(!nome || !email || !whats){
+      err.textContent = 'Por favor, preencha nome, e-mail e WhatsApp.';
+      err.style.display = 'block';
+      return;
+    }
+
+    state.lead = {nome, email, whatsapp:whats, instagram:insta};
+    fbqTrack('CompleteRegistration', {content_name:'quiz_diagnostico_tpg'});
+
+    state.screen = 'loading';
+    render();
+    submitToSheet();
+  };
+}
+
+/* ============================================================
+   SUBMIT TO GOOGLE SHEETS
+   ============================================================ */
+function submitToSheet(){
+  const payload = {
+    timestamp: new Date().toISOString(),
+    nome: state.lead.nome,
+    email: state.lead.email,
+    whatsapp: state.lead.whatsapp,
+    instagram: state.lead.instagram,
+    trilha: state.trilha,
+    resultado: state.resultado,
+    tags: JSON.stringify(state.tags),
+    respostas: JSON.stringify(state.answers)
+  };
+
+  if(GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT"){
+    fetch(GOOGLE_SHEET_URL, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify(payload)
+    }).catch(()=>{}).finally(()=>{
+      setTimeout(()=>{ state.screen='result'; render(); }, 900);
+    });
+  } else {
+    setTimeout(()=>{ state.screen='result'; render(); }, 900);
+  }
+}
+
+/* ============================================================
+   LOADING SCREEN
+   ============================================================ */
+function renderLoading(main){
+  main.innerHTML = `
+    <div class="loading-screen">
+      <div class="spinner"></div>
+      <p>Processando seu diagnóstico...</p>
+    </div>
+  `;
+}
+
+/* ============================================================
+   RESULT SCREENS
+   ============================================================ */
+function renderResult(main){
+  main.appendChild(renderProgress(100));
+  const div = document.createElement('div');
+  const r = state.resultado;
+  const nome = state.lead.nome.split(' ')[0] || '';
+
+  let html = '';
+
+  if(r === 'd1'){
+    fbqTrack('Lead', {content_name:'resultado_fora_perfil'});
+    html = `
+      <div class="result-tag">Diagnóstico</div>
+      <div class="result-title">Ainda não é o seu momento</div>
+      <div class="result-body">
+        <p>${nome}, vou ser honesto contigo:</p>
+        <p>Pelo que você respondeu, o seu negócio ainda está num momento em que um time comercial não traria o retorno que justifica o investimento. Com ticket abaixo de R$3k e/ou menos de 100 leads por mês, o custo de manter a operação come o lucro.</p>
+        <p>Isso não é crítica ao seu negócio, é timing. Estruturar comercial agora seria colocar o carro na frente dos bois. O seu próximo passo é fortalecer o marketing e o produto até chegar em volume e ticket que sustentem a operação.</p>
+        <p>Quando você chegar lá, esse diagnóstico vai fazer muito mais sentido.</p>
+      </div>
+      <a class="btn btn-secondary" href="https://www.instagram.com/fabriciorego.comercial/" target="_blank">Seguir @fabriciorego.comercial →</a>
+    `;
+  }
+
+  else if(r === 'd2'){
+    fbqTrack('Lead', {content_name:'resultado_implementacao'});
+    html = `
+      <div class="result-tag">Diagnóstico</div>
+      <div class="result-title">Pronto pra construir</div>
+      <div class="result-body">
+        <p>${nome}, vou direto ao ponto:</p>
+        <p>Seu negócio tem produto validado, ticket que sustenta e leads chegando. As peças estão na mesa. O que falta é o comercial em si: hoje a venda depende de você ou de lançamento, e isso é um teto que não se resolve com mais esforço pessoal.</p>
+        <p>Você está exatamente no ponto de construir uma operação comercial do zero — com time, processo e gestão — para o negócio vender todo dia sem depender de você.</p>
+        <p>Eu já fiz isso. Construí a operação comercial de negócios digitais do zero. Resultado: R$1,6 milhões em 18 meses, sem um único lançamento, e outro R$ 600k em 4 meses de operação de vendas diárias. Só time comercial estruturado.</p>
+      </div>
+      <div class="result-list">
+        <div class="result-list-title">O que falta</div>
+        <ul>
+          <li>Operação comercial construída do zero: time, script, CRM, funil, rotina</li>
+          <li>Processo de contratação, onboarding e treinamento de vendedores</li>
+          <li>Gestão com KPIs, rituais e forecast — pra você virar gestor, não vendedor</li>
+        </ul>
+      </div>
+      <div class="result-body">
+        <p><strong>Próximo passo:</strong> Eu faço um diagnóstico online e personalizado de 30 minutos (sem arrodeio) — gratuito — usando a metodologia T.P.G. completa. Não é automático: eu leio suas respostas, estudo seu negócio antes, e te entrego um mapa real. Candidate-se abaixo.</p>
+      </div>
+      <a class="btn" href="${LINK_CANDIDATURA}" target="_blank">CANDIDATAR-ME AO DIAGNÓSTICO →</a>
+    `;
+  }
+
+  else if(r === 'd3'){
+    fbqTrack('Lead', {content_name:'resultado_treinamento'});
+    html = `
+      <div class="result-tag">Diagnóstico</div>
+      <div class="result-title">Seu time precisa de técnica</div>
+      <div class="result-body">
+        <p>${nome}, boa notícia: as peças estão no lugar.</p>
+        <p>Você tem time, tem alguma estrutura, tem leads chegando. O que as respostas indicam é que o gargalo está na execução do time — discurso comercial, técnica de vendas, capacidade de conduzir negociação de alto ticket com segurança.</p>
+        <p>Isso é o tipo de gap que se resolve com treinamento personalizado — não um curso genérico, mas treinamento específico pro seu produto, pro seu ticket e pro perfil do seu cliente.</p>
+      </div>
+      <div class="result-list">
+        <div class="result-list-title">O que falta</div>
+        <ul>
+          <li>Script e discurso comercial construído pro seu produto específico</li>
+          <li>Treinamento de técnica de vendas adaptado ao seu ticket</li>
+          <li>Análise de calls com feedback estruturado e role play supervisionado</li>
+        </ul>
+      </div>
+      <div class="result-body">
+        <p><strong>Próximo passo:</strong> Eu faço um diagnóstico de 30 minutos (sem arrodeio) pra confirmar onde o time trava e montar o caminho certo. Candidate-se abaixo.</p>
+      </div>
+      <a class="btn" href="${LINK_CANDIDATURA}" target="_blank">CANDIDATAR-ME AO DIAGNÓSTICO →</a>
+    `;
+  }
+
+  else if(r === 'd4'){
+    fbqTrack('Lead', {content_name:'resultado_otimizacao'});
+    html = `
+      <div class="result-tag">Diagnóstico</div>
+      <div class="result-title">Seu comercial precisa de processo e gestão</div>
+      <div class="result-body">
+        <p>${nome}, você já deu o passo que a maioria não deu:</p>
+        <p>Tem gente vendendo. O produto funciona. O negócio fatura. Mas o comercial não é previsível, não é replicável, e ainda depende de você em cima pra funcionar.</p>
+        <p>O que falta não é mais gente. É estrutura: processo documentado que o time possa seguir, indicadores que mostrem onde trava, gestão que corrija rota sem precisar do dono em cada decisão.</p>
+        <p>Você não precisa desmontar o que construiu. Precisa apertar os parafusos certos numa operação que já existe.</p>
+      </div>
+      <div class="result-list">
+        <div class="result-list-title">O que falta</div>
+        <ul>
+          <li>Diagnóstico do gargalo específico: onde a operação trava no T.P.G.</li>
+          <li>Processo comercial documentado e seguido com consistência</li>
+          <li>KPIs que mostrem causa, não só consequência</li>
+          <li>Rituais de gestão que mantenham o time no trilho sem você</li>
+        </ul>
+      </div>
+      <div class="result-body">
+        <p><strong>Próximo passo:</strong> Diagnóstico de 30 minutos (sem arrodeio) — gratuito — pra mapear exatamente onde o comercial trava e o que precisa ser ajustado. Candidate-se abaixo.</p>
+      </div>
+      <a class="btn" href="${LINK_CANDIDATURA}" target="_blank">CANDIDATAR-ME AO DIAGNÓSTICO →</a>
+    `;
+  }
+
+  else if(r === 'd5'){
+    fbqTrack('Lead', {content_name:'resultado_maduro'});
+    html = `
+      <div class="result-tag">Diagnóstico</div>
+      <div class="result-title">Comercial maduro</div>
+      <div class="result-body">
+        <p>${nome}, você está num nível que poucos negócios digitais alcançam.</p>
+        <p>Tem processo, tem gestão, tem indicadores. O time roda. Nesse ponto, o que move o ponteiro não é mais ajustar o operacional — é estratégia: escala, novos vetores de receita, decisões de negócio que precisam de uma conversa de igual pra igual com alguém que já esteve onde você está.</p>
+        <p>Pode ser que o seu próximo passo não seja o comercial em si — seja o que vem depois dele.</p>
+        <p>Esse é o tipo de conversa que eu faço de dono pra dono. Se quiser trocar uma ideia sobre o que vem depois, me chama direto no WhatsApp. Sem formulário, sem processo — uma conversa.</p>
+      </div>
+      <a class="btn" href="${LINK_WHATSAPP}" target="_blank">FALAR COM FABRÍCIO NO WHATSAPP →</a>
+    `;
+  }
+
+  html += `
+    <div class="signature">
+      AFLUENTE — MENTORIA COMERCIAL<br>
+      FABRÍCIO REGO · METODOLOGIA T.P.G.
+    </div>
+  `;
+
+  div.innerHTML = html;
+  main.appendChild(div);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+render();
+</script>
+</body>
+</html>
